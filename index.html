@@ -1,0 +1,1569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Leader 360° Feedback Portal</title>
+    
+    <!-- React & React DOM CDN (Production Build) -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    
+    <!-- Babel standalone for runtime JSX compilation -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Tailwind CSS Engine -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        /* Modern Keyframe Animations for Professional Feel */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes scaleUp {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-4px); }
+            75% { transform: translateX(4px); }
+        }
+
+        .animate-fadeIn {
+            animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .animate-scaleUp {
+            animation: scaleUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .animate-shake {
+            animation: shake 0.2s ease-in-out 2;
+        }
+
+        /* Customize Scrollbars for clean dashboard views */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased">
+    
+    <!-- Mount Root for React application -->
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useMemo } = React;
+
+        // ==========================================
+        // SYSTEM ICON ENGINE (Replaces lucide-react library)
+        // ==========================================
+        const Icon = ({ name, className = "w-4 h-4", ...props }) => {
+            const icons = {
+                shield: <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>,
+                users: (
+                    <g>
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                        <circle cx="9" cy="7" r="4" />
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                    </g>
+                ),
+                bookopen: (
+                    <g>
+                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+                    </g>
+                ),
+                clock: (
+                    <g>
+                        <circle cx="12" cy="12" r="10" />
+                        <polyline points="12 6 12 12 16 14" />
+                    </g>
+                ),
+                messagesquare: <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>,
+                barchart2: (
+                    <g>
+                        <line x1="18" y1="20" x2="18" y2="10" />
+                        <line x1="12" y1="20" x2="12" y2="4" />
+                        <line x1="6" y1="20" x2="6" y2="14" />
+                    </g>
+                ),
+                send: (
+                    <g>
+                        <line x1="22" y1="2" x2="11" y2="13" />
+                        <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                    </g>
+                ),
+                checkcircle: (
+                    <g>
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                        <polyline points="22 4 12 14.01 9 11.01" />
+                    </g>
+                ),
+                chevronright: <polyline points="9 18 15 12 9 6" />,
+                chevronleft: <polyline points="15 18 9 12 15 6" />,
+                plus: (
+                    <g>
+                        <line x1="12" y1="5" x2="12" y2="19" />
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                    </g>
+                ),
+                alertcircle: (
+                    <g>
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="12" y1="8" x2="12" y2="12" />
+                        <line x1="12" y1="16" x2="12.01" y2="16" />
+                    </g>
+                ),
+                award: (
+                    <g>
+                        <circle cx="12" cy="8" r="7" />
+                        <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88" />
+                    </g>
+                ),
+                calendar: (
+                    <g>
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                        <line x1="16" y1="2" x2="16" y2="6" />
+                        <line x1="8" y1="2" x2="8" y2="6" />
+                        <line x1="3" y1="10" x2="21" y2="10" />
+                    </g>
+                ),
+                sparkles: <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-.877a.5.5 0 0 1 0-.972l6.135-.877A2 2 0 0 0 9.937 9.938l.877-6.135a.5.5 0 0 1 .972 0l.877 6.135a2 2 0 0 0 1.438 1.437l6.135.877a.5.5 0 0 1 0 .972l-6.135.877a2 2 0 0 0-1.438 1.438l-.877 6.135a.5.5 0 0 1-.972 0l-.877-6.135z" />,
+                lock: (
+                    <g>
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                    </g>
+                ),
+                unlock: (
+                    <g>
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                        <path d="M7 11V7a5 5 0 0 1 9.9-1" />
+                    </g>
+                ),
+                heart: <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />,
+                eye: (
+                    <g>
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                        <circle cx="12" cy="12" r="3" />
+                    </g>
+                ),
+                eyeoff: (
+                    <g>
+                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                        <line x1="1" y1="1" x2="23" y2="23" />
+                    </g>
+                )
+            };
+
+            const path = icons[name.toLowerCase()] || <circle cx="12" cy="12" r="10" />;
+            
+            return (
+                <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    strokeWidth="2" 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                    className={className}
+                    {...props}
+                >
+                    {path}
+                </svg>
+            );
+        };
+
+        // ==========================================
+        // INITIAL MOCK DATA
+        // ==========================================
+        const INITIAL_MANAGERS = [
+            { id: 'mgr-1', name: 'Sarah Jenkins', team: 'Enterprise Sales East' },
+            { id: 'mgr-2', name: 'Marcus Vance', team: 'Mid-Market Central' },
+            { id: 'mgr-3', name: 'Elena Rostova', team: 'SDR Outbound Team' },
+            { id: 'mgr-4', name: 'David Cho', team: 'Inbound Growth' }
+        ];
+
+        const INITIAL_FEEDBACK = [
+            {
+                id: 'f-1',
+                managerId: 'mgr-1',
+                timestamp: '2026-05-10T14:30:00Z',
+                coachingRating: 5,
+                coachingFrequency: 'Weekly',
+                meetingsRating: 4,
+                meetingsFrequency: 'Weekly',
+                expertRating: 5,
+                availableRating: 4,
+                startFeedback: "Start sharing your closing scripts with the newer team members earlier in onboarding.",
+                stopFeedback: "Stop rescheduling our 1-on-1s last minute; it breaks the momentum of the sales week.",
+                continueFeedback: "Continue the deep-dive deal strategy sessions. They help me save slipping accounts."
+            },
+            {
+                id: 'f-2',
+                managerId: 'mgr-1',
+                timestamp: '2026-05-12T09:15:00Z',
+                coachingRating: 4,
+                coachingFrequency: 'Bi-weekly',
+                meetingsRating: 5,
+                meetingsFrequency: 'Weekly',
+                expertRating: 4,
+                availableRating: 5,
+                startFeedback: "Start doing more live-call shadowing. Real-time feedback is where I learn best.",
+                stopFeedback: "Stop micro-managing the CRM update frequency as long as quotas are met.",
+                continueFeedback: "Always being accessible when we have a hot prospect on a live line."
+            },
+            {
+                id: 'f-3',
+                managerId: 'mgr-2',
+                timestamp: '2026-05-14T11:00:00Z',
+                coachingRating: 2,
+                coachingFrequency: 'Rarely',
+                meetingsRating: 3,
+                meetingsFrequency: 'Bi-weekly',
+                expertRating: 3,
+                availableRating: 2,
+                startFeedback: "Start blocking out dedicated availability during high-volume calling hours.",
+                stopFeedback: "Stop canceling our 1-on-1 coaching sessions. I feel left to figure things out on my own.",
+                continueFeedback: "The pipeline reviews are helpful when we actually have them."
+            },
+            {
+                id: 'f-4',
+                managerId: 'mgr-2',
+                timestamp: '2026-05-15T16:45:00Z',
+                coachingRating: 3,
+                coachingFrequency: 'Monthly',
+                meetingsRating: 2,
+                meetingsFrequency: 'Monthly',
+                expertRating: 4,
+                availableRating: 3,
+                startFeedback: "Start hosting structured team syncs so we can share winning strategies.",
+                stopFeedback: "Stop running meetings without a clear, sales-focused agenda.",
+                continueFeedback: "Being very knowledgeable about contract terms and technical edge cases."
+            },
+            {
+                id: 'f-5',
+                managerId: 'mgr-3',
+                timestamp: '2026-05-16T10:20:00Z',
+                coachingRating: 5,
+                coachingFrequency: 'Weekly',
+                meetingsRating: 5,
+                meetingsFrequency: 'Daily Huddles',
+                expertRating: 5,
+                availableRating: 5,
+                startFeedback: "Start incorporating peer-to-peer roleplaying in our team huddles.",
+                stopFeedback: "Nothing to stop! Keep up this incredible pace.",
+                continueFeedback: "Providing hyper-specific feedback on our email outreach templates. My reply rate doubled."
+            }
+        ];
+
+        // ==========================================
+        // MAIN PORTAL APPLICATION
+        // ==========================================
+        function App() {
+            // Navigation & Role States
+            const [activeTab, setActiveTab] = useState('agent'); // 'agent' or 'dashboard'
+            const [managers, setManagers] = useState(INITIAL_MANAGERS);
+            const [feedbacks, setFeedbacks] = useState(INITIAL_FEEDBACK);
+
+            // Security & Authentication Access States
+            const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
+            const [showAuthModal, setShowAuthModal] = useState(false);
+            const [enteredPasscode, setEnteredPasscode] = useState('');
+            const [authError, setAuthError] = useState('');
+            const [showPasscodeText, setShowPasscodeText] = useState(false);
+            
+            const MASTER_PASSCODE = "admin360";
+
+            // Agent Form Flow States
+            const [currentStep, setCurrentStep] = useState(1);
+            const [selectedManagerId, setSelectedManagerId] = useState('');
+            const [coachingRating, setCoachingRating] = useState(0);
+            const [coachingFrequency, setCoachingFrequency] = useState('');
+            const [meetingsRating, setMeetingsRating] = useState(0);
+            const [meetingsFrequency, setMeetingsFrequency] = useState('');
+            const [expertRating, setExpertRating] = useState(0);
+            const [availableRating, setAvailableRating] = useState(0);
+            const [startFeedback, setStartFeedback] = useState('');
+            const [stopFeedback, setStopFeedback] = useState('');
+            const [continueFeedback, setContinueFeedback] = useState('');
+            const [isFormSubmitted, setIsFormSubmitted] = useState(false);
+
+            // Dashboard Selector States
+            const [dashboardManagerId, setDashboardManagerId] = useState(INITIAL_MANAGERS[0].id);
+            const [newManagerName, setNewManagerName] = useState('');
+            const [newManagerTeam, setNewManagerTeam] = useState('');
+            const [showAddManagerModal, setShowAddManagerModal] = useState(false);
+
+            // Secure Access Handlers
+            const handleTabChange = (targetTab) => {
+                if (targetTab === 'dashboard') {
+                    if (isAdminAuthenticated) {
+                        setActiveTab('dashboard');
+                    } else {
+                        setAuthError('');
+                        setEnteredPasscode('');
+                        setShowAuthModal(true);
+                    }
+                } else {
+                    setActiveTab('agent');
+                    setIsFormSubmitted(false);
+                }
+            };
+
+            const handleAuthSubmit = (e) => {
+                e.preventDefault();
+                if (enteredPasscode.trim() === MASTER_PASSCODE) {
+                    setIsAdminAuthenticated(true);
+                    setShowAuthModal(false);
+                    setAuthError('');
+                    setEnteredPasscode('');
+                    setActiveTab('dashboard');
+                } else {
+                    setAuthError('Access Denied. Incorrect administration passcode.');
+                    setEnteredPasscode('');
+                }
+            };
+
+            const handleLockDashboard = () => {
+                setIsAdminAuthenticated(false);
+                setActiveTab('agent');
+                setIsFormSubmitted(false);
+            };
+
+            // Process New Review Submission
+            const handleFeedbackSubmit = (e) => {
+                e.preventDefault();
+                if (!selectedManagerId || !coachingRating || !coachingFrequency || !meetingsRating || !meetingsFrequency || !expertRating || !availableRating) {
+                    alert("Please fill out all ratings and frequency fields before submitting.");
+                    return;
+                }
+
+                const newSubmission = {
+                    id: `f-${Date.now()}`,
+                    managerId: selectedManagerId,
+                    timestamp: new Date().toISOString(),
+                    coachingRating: Number(coachingRating),
+                    coachingFrequency,
+                    meetingsRating: Number(meetingsRating),
+                    meetingsFrequency,
+                    expertRating: Number(expertRating),
+                    availableRating: Number(availableRating),
+                    startFeedback: startFeedback.trim(),
+                    stopFeedback: stopFeedback.trim(),
+                    continueFeedback: continueFeedback.trim()
+                };
+
+                setFeedbacks([newSubmission, ...feedbacks]);
+                setIsFormSubmitted(true);
+                resetForm();
+            };
+
+            const resetForm = () => {
+                setCoachingRating(0);
+                setCoachingFrequency('');
+                setMeetingsRating(0);
+                setMeetingsFrequency('');
+                setExpertRating(0);
+                setAvailableRating(0);
+                setStartFeedback('');
+                setStopFeedback('');
+                setContinueFeedback('');
+                setCurrentStep(1);
+            };
+
+            const startNewFeedback = () => {
+                setIsFormSubmitted(false);
+                setSelectedManagerId('');
+            };
+
+            const handleAddManager = (e) => {
+                e.preventDefault();
+                if (!newManagerName.trim() || !newManagerTeam.trim()) return;
+
+                const newId = `mgr-${Date.now()}`;
+                const newMgr = {
+                    id: newId,
+                    name: newManagerName.trim(),
+                    team: newManagerTeam.trim()
+                };
+
+                setManagers([...managers, newMgr]);
+                setDashboardManagerId(newId);
+                setNewManagerName('');
+                setNewManagerTeam('');
+                setShowAddManagerModal(false);
+            };
+
+            // Real-time Analytic Calculations
+            const managerStats = useMemo(() => {
+                const currentMgr = managers.find(m => m.id === dashboardManagerId) || managers[0];
+                const mgrFeedbacks = feedbacks.filter(f => f.managerId === currentMgr.id);
+
+                if (mgrFeedbacks.length === 0) {
+                    return {
+                        manager: currentMgr,
+                        totalFeedback: 0,
+                        avgCoaching: 0,
+                        avgMeetings: 0,
+                        avgExpert: 0,
+                        avgAvailable: 0,
+                        overallScore: 0,
+                        coachingFreqDistribution: {},
+                        meetingsFreqDistribution: {},
+                        comments: []
+                    };
+                }
+
+                const total = mgrFeedbacks.length;
+                let sumCoaching = 0, sumMeetings = 0, sumExpert = 0, sumAvailable = 0;
+                const coachFreq = {};
+                const meetFreq = {};
+
+                mgrFeedbacks.forEach(f => {
+                    sumCoaching += f.coachingRating;
+                    sumMeetings += f.meetingsRating;
+                    sumExpert += f.expertRating;
+                    sumAvailable += f.availableRating;
+
+                    coachFreq[f.coachingFrequency] = (coachFreq[f.coachingFrequency] || 0) + 1;
+                    meetFreq[f.meetingsFrequency] = (meetFreq[f.meetingsFrequency] || 0) + 1;
+                });
+
+                const avgCoaching = parseFloat((sumCoaching / total).toFixed(1));
+                const avgMeetings = parseFloat((sumMeetings / total).toFixed(1));
+                const avgExpert = parseFloat((sumExpert / total).toFixed(1));
+                const avgAvailable = parseFloat((sumAvailable / total).toFixed(1));
+                const overallScore = parseFloat(((avgCoaching + avgMeetings + avgExpert + avgAvailable) / 4).toFixed(1));
+
+                return {
+                    manager: currentMgr,
+                    totalFeedback: total,
+                    avgCoaching,
+                    avgMeetings,
+                    avgExpert,
+                    avgAvailable,
+                    overallScore,
+                    coachingFreqDistribution: coachFreq,
+                    meetingsFreqDistribution: meetFreq,
+                    comments: mgrFeedbacks.map(f => ({
+                        timestamp: f.timestamp,
+                        start: f.startFeedback,
+                        stop: f.stopFeedback,
+                        continue: f.continueFeedback
+                    }))
+                };
+            }, [dashboardManagerId, feedbacks, managers]);
+
+            const globalStats = useMemo(() => {
+                return {
+                    totalSubmissions: feedbacks.length,
+                    managedCount: managers.length
+                };
+            }, [feedbacks, managers]);
+
+            return (
+                <div className="min-h-screen bg-slate-50 text-slate-800 font-sans">
+                    
+                    {/* ==========================================
+                        HEADER BANNER & ROLE SELECTOR
+                        ========================================== */}
+                    <header className="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-xs">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                            <div className="flex flex-col sm:flex-row items-center justify-between py-4 space-y-4 sm:space-y-0">
+                                
+                                <div className="flex items-center space-x-3">
+                                    <div className="p-2.5 bg-indigo-600 text-white rounded-xl shadow-md shadow-indigo-100">
+                                        <Icon name="shield" className="w-6 h-6" />
+                                    </div>
+                                    <div>
+                                        <h1 className="text-xl font-bold tracking-tight text-slate-950">Sales Leader 360°</h1>
+                                        <p className="text-xs text-slate-500 font-medium">Safe, Anonymous Coaching & Leadership Analytics</p>
+                                    </div>
+                                </div>
+
+                                <div className="hidden md:flex items-center space-x-4 bg-slate-100 px-4 py-1.5 rounded-full text-xs font-semibold text-slate-600">
+                                    <span className="flex items-center space-x-1">
+                                        <Icon name="users" className="w-3.5 h-3.5 text-indigo-500" />
+                                        <span>{globalStats.managedCount} Leaders Rated</span>
+                                    </span>
+                                    <span className="w-1 h-1 bg-slate-300 rounded-full"></span>
+                                    <span className="flex items-center space-x-1">
+                                        <Icon name="messagesquare" className="w-3.5 h-3.5 text-emerald-500" />
+                                        <span>{globalStats.totalSubmissions} Feedback Responses</span>
+                                    </span>
+                                </div>
+
+                                <div className="flex bg-slate-100 p-1.5 rounded-xl border border-slate-200">
+                                    <button
+                                        onClick={() => handleTabChange('agent')}
+                                        className={`flex items-center space-x-2 px-4 py-2 text-sm font-semibold rounded-lg transition-all ${
+                                            activeTab === 'agent'
+                                                ? 'bg-white text-indigo-700 shadow-sm'
+                                                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/50'
+                                        }`}
+                                    >
+                                        <Icon name="lock" className="w-4 h-4 text-emerald-600" />
+                                        <span>Submit Feedback (Agent)</span>
+                                    </button>
+                                    <button
+                                        onClick={() => handleTabChange('dashboard')}
+                                        className={`flex items-center space-x-2 px-4 py-2 text-sm font-semibold rounded-lg transition-all ${
+                                            activeTab === 'dashboard'
+                                                ? 'bg-indigo-600 text-white shadow-sm'
+                                                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/50'
+                                        }`}
+                                    >
+                                        {isAdminAuthenticated ? (
+                                            <Icon name="unlock" className="w-4 h-4 text-emerald-400" />
+                                        ) : (
+                                            <Icon name="lock" className="w-4 h-4 text-slate-400" />
+                                        )}
+                                        <span>Leaderboard & Analytics</span>
+                                    </button>
+                                </div>
+
+                            </div>
+                        </div>
+                    </header>
+
+                    {/* ==========================================
+                        PASSCODE PROTECTION MODAL (ADMIN ACCESS)
+                        ========================================== */}
+                    {showAuthModal && (
+                        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                            <div className="bg-white rounded-2xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-100 animate-scaleUp relative overflow-hidden">
+                                <div className="absolute right-0 top-0 opacity-5 transform translate-x-1/6 -translate-y-1/6 text-slate-900">
+                                    <Icon name="lock" className="w-48 h-48" />
+                                </div>
+
+                                <div className="relative z-10 text-center">
+                                    <div className="inline-flex items-center justify-center p-3.5 bg-indigo-50 text-indigo-600 rounded-full mb-4 ring-8 ring-indigo-50/50">
+                                        <Icon name="lock" className="w-6 h-6" />
+                                    </div>
+                                    
+                                    <h3 className="text-xl font-bold text-slate-900">Leadership & Admin Verification</h3>
+                                    <p className="text-xs text-slate-500 mt-1.5 px-4">
+                                        The leaderboard and aggregate scores are secured to safeguard honesty and feedback objectivity.
+                                    </p>
+
+                                    <form onSubmit={handleAuthSubmit} className="mt-6 space-y-4">
+                                        <div className="relative">
+                                            <input
+                                                type={showPasscodeText ? "text" : "password"}
+                                                required
+                                                autoFocus
+                                                placeholder="Enter Admin Passcode"
+                                                value={enteredPasscode}
+                                                onChange={(e) => setEnteredPasscode(e.target.value)}
+                                                className="w-full rounded-xl border border-slate-200 pl-4 pr-12 py-3 text-sm text-center font-semibold tracking-wider focus:ring-4 focus:ring-indigo-100 focus:border-indigo-600 focus:outline-hidden transition-all placeholder:tracking-normal placeholder:font-normal"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowPasscodeText(!showPasscodeText)}
+                                                className="absolute inset-y-0 right-0 px-4 flex items-center text-slate-400 hover:text-slate-600 transition-colors"
+                                            >
+                                                {showPasscodeText ? <Icon name="eyeoff" className="w-4 h-4" /> : <Icon name="eye" className="w-4 h-4" />}
+                                            </button>
+                                        </div>
+
+                                        {authError && (
+                                            <div className="flex items-center justify-center space-x-1.5 p-2 bg-rose-50 border border-rose-100 rounded-xl text-rose-700 text-xs font-semibold animate-shake">
+                                                <Icon name="alertcircle" className="w-4 h-4 shrink-0" />
+                                                <span>{authError}</span>
+                                            </div>
+                                        )}
+
+                                        <div className="flex space-x-2 pt-2">
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowAuthModal(false)}
+                                                className="w-1/2 py-2.5 border border-slate-200 text-slate-600 rounded-xl text-xs font-bold hover:bg-slate-50 transition-colors"
+                                            >
+                                                Cancel
+                                            </button>
+                                            <button
+                                                type="submit"
+                                                className="w-1/2 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-md shadow-indigo-100 transition-all"
+                                            >
+                                                Verify Passcode
+                                            </button>
+                                        </div>
+                                    </form>
+
+                                    <div className="mt-6 p-3 bg-slate-50 border border-slate-150 rounded-xl text-left text-[11px] text-slate-500">
+                                        <span className="font-bold text-slate-700 block mb-0.5">💡 Demo Access Guide</span>
+                                        <span>To view the reports as a reviewer or director, use the passcode <code className="bg-slate-200 px-1 py-0.5 rounded-sm font-mono text-slate-800 font-semibold">admin360</code>.</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* ==========================================
+                        AGENT SUBMISSION FUNNEL (ANONYMOUS)
+                        ========================================== */}
+                    {activeTab === 'agent' && (
+                        <main className="max-w-3xl mx-auto px-4 py-8 sm:px-6 lg:py-12">
+                            
+                            <div className="bg-gradient-to-br from-indigo-900 to-indigo-950 text-white rounded-2xl p-6 mb-8 shadow-xl relative overflow-hidden">
+                                <div className="absolute right-0 top-0 opacity-10 transform translate-x-1/4 -translate-y-1/4">
+                                    <Icon name="shield" className="w-96 h-96" />
+                                </div>
+                                <div className="relative z-10">
+                                    <div className="inline-flex items-center space-x-2 bg-indigo-500/20 border border-indigo-400/30 text-indigo-200 px-3 py-1 rounded-full text-xs font-semibold mb-3">
+                                        <Icon name="lock" className="w-3 h-3" />
+                                        <span>Verified 100% Anonymous</span>
+                                    </div>
+                                    <h2 className="text-2xl font-bold mb-2">Elevating Our Sales Leadership</h2>
+                                    <p className="text-slate-200 text-sm leading-relaxed mb-4">
+                                        To build high-performing sales environments, our sales managers need transparent, actionable feedback. Your answers are deeply aggregated and stripped of names, times, IP details, or metadata.
+                                    </p>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-3 border-t border-indigo-800/60 text-xs text-indigo-200">
+                                        <div className="flex items-center space-x-2">
+                                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-400"></div>
+                                            <span>No account login required</span>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-400"></div>
+                                            <span>Answers randomized in dashboard</span>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-400"></div>
+                                            <span>Strict focus on development</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {!isFormSubmitted ? (
+                                <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden animate-scaleUp">
+                                    <div className="px-6 py-5 border-b border-slate-100 bg-slate-50/50">
+                                        <div className="flex justify-between items-center mb-3">
+                                            <span className="text-xs font-bold text-indigo-600 tracking-wider uppercase">Step {currentStep} of 5</span>
+                                            <span className="text-xs text-slate-500 font-medium">
+                                                {currentStep === 1 && "Choose Leader"}
+                                                {currentStep === 2 && "Coaching Frequency & Impact"}
+                                                {currentStep === 3 && "Meetings Quality"}
+                                                {currentStep === 4 && "Expertise & Availability"}
+                                                {currentStep === 5 && "Stop, Start, Continue"}
+                                            </span>
+                                        </div>
+                                        <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                                            <div 
+                                                className="bg-indigo-600 h-full transition-all duration-300"
+                                                style={{ width: `${(currentStep / 5) * 100}%` }}
+                                            ></div>
+                                        </div>
+                                    </div>
+
+                                    <form onSubmit={handleFeedbackSubmit} className="p-6 sm:p-8 space-y-6">
+                                        
+                                        {/* STEP 1: SELECT MANAGER */}
+                                        {currentStep === 1 && (
+                                            <div className="space-y-4 animate-fadeIn">
+                                                <div className="text-center max-w-md mx-auto mb-6">
+                                                    <h3 className="text-lg font-bold text-slate-900">Select Your Sales Manager</h3>
+                                                    <p className="text-sm text-slate-500 mt-1">Which manager are you reviewing today? If you report to multiple, you can submit separate feedback.</p>
+                                                </div>
+
+                                                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 max-w-2xl mx-auto">
+                                                    {managers.map((mgr) => (
+                                                        <button
+                                                            type="button"
+                                                            key={mgr.id}
+                                                            onClick={() => setSelectedManagerId(mgr.id)}
+                                                            className={`flex items-start p-4 rounded-xl border text-left transition-all ${
+                                                                selectedManagerId === mgr.id
+                                                                    ? 'border-indigo-600 bg-indigo-50/40 ring-2 ring-indigo-500/15'
+                                                                    : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50/50'
+                                                            }`}
+                                                        >
+                                                            <div className={`p-2.5 rounded-lg mr-3 ${selectedManagerId === mgr.id ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-500'}`}>
+                                                                <Icon name="users" className="w-5 h-5" />
+                                                            </div>
+                                                            <div>
+                                                                <p className="font-semibold text-slate-900">{mgr.name}</p>
+                                                                <p className="text-xs text-slate-500 mt-0.5">{mgr.team}</p>
+                                                            </div>
+                                                        </button>
+                                                    ))}
+                                                </div>
+
+                                                <div className="p-3 bg-slate-50 border border-slate-150 rounded-xl text-center text-xs text-slate-500 flex items-center justify-center space-x-2 max-w-md mx-auto mt-6">
+                                                    <Icon name="alertcircle" className="w-4 h-4 text-indigo-500 shrink-0" />
+                                                    <span>Don't see your manager? Add them securely in the Dashboard tab with the passcode.</span>
+                                                </div>
+
+                                                <div className="flex justify-end pt-4 border-t border-slate-100 mt-6">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setCurrentStep(2)}
+                                                        disabled={!selectedManagerId}
+                                                        className={`flex items-center space-x-1.5 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all ${
+                                                            selectedManagerId 
+                                                                ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm' 
+                                                                : 'bg-slate-150 text-slate-400 cursor-not-allowed'
+                                                        }`}
+                                                    >
+                                                        <span>Begin Evaluation</span>
+                                                        <Icon name="chevronright" className="w-4 h-4" />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* STEP 2: COACHING */}
+                                        {currentStep === 2 && (
+                                            <div className="space-y-6 animate-fadeIn">
+                                                <div className="flex items-center space-x-3 mb-2">
+                                                    <div className="p-2 bg-emerald-100 text-emerald-700 rounded-lg">
+                                                        <Icon name="users" className="w-5 h-5" />
+                                                    </div>
+                                                    <div>
+                                                        <h3 className="text-lg font-bold text-slate-900">Dimension 1: 1-on-1 Coaching & Progress</h3>
+                                                        <p className="text-xs text-slate-500">How consistently and effectively does your manager help you grow?</p>
+                                                    </div>
+                                                </div>
+
+                                                <div className="space-y-2">
+                                                    <label className="block text-sm font-semibold text-slate-700">
+                                                        1. How frequently do you receive focused 1-on-1 coaching?
+                                                    </label>
+                                                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                                                        {['Daily', 'Weekly', 'Bi-weekly', 'Monthly', 'Rarely'].map((freq) => (
+                                                            <button
+                                                                type="button"
+                                                                key={freq}
+                                                                onClick={() => setCoachingFrequency(freq)}
+                                                                className={`px-3 py-2.5 rounded-lg border text-xs font-semibold text-center transition-all ${
+                                                                    coachingFrequency === freq
+                                                                        ? 'bg-indigo-600 border-indigo-600 text-white'
+                                                                        : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
+                                                                }`}
+                                                            >
+                                                                {freq}
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                </div>
+
+                                                <div className="space-y-3 pt-2">
+                                                    <label className="block text-sm font-semibold text-slate-700">
+                                                        2. How would you rate the impact and quality of these coaching sessions?
+                                                    </label>
+                                                    <div className="flex items-center justify-between max-w-md bg-slate-50 p-3 rounded-xl border border-slate-100">
+                                                        <span className="text-xs text-slate-400 font-bold">Unhelpful</span>
+                                                        <div className="flex space-x-2">
+                                                            {[1, 2, 3, 4, 5].map((num) => (
+                                                                <button
+                                                                    type="button"
+                                                                    key={num}
+                                                                    onClick={() => setCoachingRating(num)}
+                                                                    className={`w-10 h-10 rounded-full font-bold flex items-center justify-center transition-all ${
+                                                                        coachingRating === num
+                                                                            ? 'bg-indigo-600 text-white ring-4 ring-indigo-100'
+                                                                            : 'bg-white border border-slate-200 text-slate-700 hover:border-slate-300'
+                                                                    }`}
+                                                                >
+                                                                    {num}
+                                                                </button>
+                                                            ))}
+                                                        </div>
+                                                        <span className="text-xs text-emerald-600 font-bold">Incredible</span>
+                                                    </div>
+                                                    <p className="text-xs text-slate-400 leading-relaxed italic">
+                                                        Guidance: 5 means sessions directly impact your quota hitting ability and deal resolution. 1 means they are checklist exercises.
+                                                    </p>
+                                                </div>
+
+                                                <div className="flex justify-between pt-6 border-t border-slate-100">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setCurrentStep(1)}
+                                                        className="flex items-center space-x-1 px-4 py-2 border border-slate-200 rounded-xl text-slate-600 font-semibold text-sm hover:bg-slate-50"
+                                                    >
+                                                        <Icon name="chevronleft" className="w-4 h-4" />
+                                                        <span>Back</span>
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setCurrentStep(3)}
+                                                        disabled={!coachingFrequency || !coachingRating}
+                                                        className={`flex items-center space-x-1 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all ${
+                                                            coachingFrequency && coachingRating
+                                                                ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm'
+                                                                : 'bg-slate-150 text-slate-400 cursor-not-allowed'
+                                                        }`}
+                                                    >
+                                                        <span>Next Step</span>
+                                                        <Icon name="chevronright" className="w-4 h-4" />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* STEP 3: MEETINGS */}
+                                        {currentStep === 3 && (
+                                            <div className="space-y-6 animate-fadeIn">
+                                                <div className="flex items-center space-x-3 mb-2">
+                                                    <div className="p-2 bg-blue-100 text-blue-700 rounded-lg">
+                                                        <Icon name="calendar" className="w-5 h-5" />
+                                                    </div>
+                                                    <div>
+                                                        <h3 className="text-lg font-bold text-slate-900">Dimension 2: Team Meetings & Strategy</h3>
+                                                        <p className="text-xs text-slate-500">Are team huddles motivating, actionable, and structured?</p>
+                                                    </div>
+                                                </div>
+
+                                                <div className="space-y-2">
+                                                    <label className="block text-sm font-semibold text-slate-700">
+                                                        1. How frequently does your manager hold team meetings/huddles?
+                                                    </label>
+                                                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                                                        {['Daily Huddles', 'Weekly', 'Bi-weekly', 'Monthly', 'Rarely'].map((freq) => (
+                                                            <button
+                                                                type="button"
+                                                                key={freq}
+                                                                onClick={() => setMeetingsFrequency(freq)}
+                                                                className={`px-3 py-2.5 rounded-lg border text-xs font-semibold text-center transition-all ${
+                                                                    meetingsFrequency === freq
+                                                                        ? 'bg-indigo-600 border-indigo-600 text-white'
+                                                                        : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
+                                                                }`}
+                                                            >
+                                                                {freq}
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                </div>
+
+                                                <div className="space-y-3 pt-2">
+                                                    <label className="block text-sm font-semibold text-slate-700">
+                                                        2. How valuable are these team meetings to aligning priorities and resolving roadblocks?
+                                                    </label>
+                                                    <div className="flex items-center justify-between max-w-md bg-slate-50 p-3 rounded-xl border border-slate-100">
+                                                        <span className="text-xs text-slate-400 font-bold">Waste of Time</span>
+                                                        <div className="flex space-x-2">
+                                                            {[1, 2, 3, 4, 5].map((num) => (
+                                                                <button
+                                                                    type="button"
+                                                                    key={num}
+                                                                    onClick={() => setMeetingsRating(num)}
+                                                                    className={`w-10 h-10 rounded-full font-bold flex items-center justify-center transition-all ${
+                                                                        meetingsRating === num
+                                                                            ? 'bg-indigo-600 text-white ring-4 ring-indigo-100'
+                                                                            : 'bg-white border border-slate-200 text-slate-700 hover:border-slate-300'
+                                                                    }`}
+                                                                >
+                                                                    {num}
+                                                                </button>
+                                                            ))}
+                                                        </div>
+                                                        <span className="text-xs text-emerald-600 font-bold">High Value</span>
+                                                    </div>
+                                                    <p className="text-xs text-slate-400 leading-relaxed italic">
+                                                        Guidance: High-scoring meetings focus on strategic hurdles, win-sharing, and clean updates. Low-scoring meetings feel like uninspired metric-checking.
+                                                    </p>
+                                                </div>
+
+                                                <div className="flex justify-between pt-6 border-t border-slate-100">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setCurrentStep(2)}
+                                                        className="flex items-center space-x-1 px-4 py-2 border border-slate-200 rounded-xl text-slate-600 font-semibold text-sm hover:bg-slate-50"
+                                                    >
+                                                        <Icon name="chevronleft" className="w-4 h-4" />
+                                                        <span>Back</span>
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setCurrentStep(4)}
+                                                        disabled={!meetingsFrequency || !meetingsRating}
+                                                        className={`flex items-center space-x-1 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all ${
+                                                            meetingsFrequency && meetingsRating
+                                                                ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm'
+                                                                : 'bg-slate-150 text-slate-400 cursor-not-allowed'
+                                                        }`}
+                                                    >
+                                                        <span>Next Step</span>
+                                                        <Icon name="chevronright" className="w-4 h-4" />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* STEP 4: EXPERTISE & AVAILABILITY */}
+                                        {currentStep === 4 && (
+                                            <div className="space-y-6 animate-fadeIn">
+                                                <div className="flex items-center space-x-3 mb-2">
+                                                    <div className="p-2 bg-purple-100 text-purple-700 rounded-lg">
+                                                        <Icon name="bookopen" className="w-5 h-5" />
+                                                    </div>
+                                                    <div>
+                                                        <h3 className="text-lg font-bold text-slate-900">Dimensions 3 & 4: Leader Expertise & Availability</h3>
+                                                        <p className="text-xs text-slate-500">How reliable is your manager during live client deals and tough negotiations?</p>
+                                                    </div>
+                                                </div>
+
+                                                <div className="space-y-3">
+                                                    <label className="block text-sm font-semibold text-slate-700">
+                                                        1. Being the Expert: Rate their functional selling expertise.
+                                                    </label>
+                                                    <p className="text-xs text-slate-500">
+                                                        Do they demonstrate excellent closing techniques, objection-handling, system-knowledge, and actionable feedback?
+                                                    </p>
+                                                    <div className="flex items-center justify-between max-w-md bg-slate-50 p-3 rounded-xl border border-slate-100">
+                                                        <span className="text-xs text-slate-400 font-bold">Unskilled</span>
+                                                        <div className="flex space-x-2">
+                                                            {[1, 2, 3, 4, 5].map((num) => (
+                                                                <button
+                                                                    type="button"
+                                                                    key={num}
+                                                                    onClick={() => setExpertRating(num)}
+                                                                    className={`w-10 h-10 rounded-full font-bold flex items-center justify-center transition-all ${
+                                                                        expertRating === num
+                                                                            ? 'bg-indigo-600 text-white ring-4 ring-indigo-100'
+                                                                            : 'bg-white border border-slate-200 text-slate-700 hover:border-slate-300'
+                                                                    }`}
+                                                                >
+                                                                    {num}
+                                                                </button>
+                                                            ))}
+                                                        </div>
+                                                        <span className="text-xs text-emerald-600 font-bold">Deal-maker</span>
+                                                    </div>
+                                                </div>
+
+                                                <div className="space-y-3 pt-4 border-t border-slate-100">
+                                                    <label className="block text-sm font-semibold text-slate-700">
+                                                        2. Being Available: Rate their accessibility and support.
+                                                    </label>
+                                                    <p className="text-xs text-slate-500">
+                                                        Are they responsive when you need pricing approvals, deal-signing support, or are on a high-stakes call?
+                                                    </p>
+                                                    <div className="flex items-center justify-between max-w-md bg-slate-50 p-3 rounded-xl border border-slate-100">
+                                                        <span className="text-xs text-slate-400 font-bold">Hard to reach</span>
+                                                        <div className="flex space-x-2">
+                                                            {[1, 2, 3, 4, 5].map((num) => (
+                                                                <button
+                                                                    type="button"
+                                                                    key={num}
+                                                                    onClick={() => setAvailableRating(num)}
+                                                                    className={`w-10 h-10 rounded-full font-bold flex items-center justify-center transition-all ${
+                                                                        availableRating === num
+                                                                            ? 'bg-indigo-600 text-white ring-4 ring-indigo-100'
+                                                                            : 'bg-white border border-slate-200 text-slate-700 hover:border-slate-300'
+                                                                    }`}
+                                                                >
+                                                                    {num}
+                                                                </button>
+                                                            ))}
+                                                        </div>
+                                                        <span className="text-xs text-emerald-600 font-bold">Always there</span>
+                                                    </div>
+                                                </div>
+
+                                                <div className="flex justify-between pt-6 border-t border-slate-100">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setCurrentStep(3)}
+                                                        className="flex items-center space-x-1 px-4 py-2 border border-slate-200 rounded-xl text-slate-600 font-semibold text-sm hover:bg-slate-50"
+                                                    >
+                                                        <Icon name="chevronleft" className="w-4 h-4" />
+                                                        <span>Back</span>
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setCurrentStep(5)}
+                                                        disabled={!expertRating || !availableRating}
+                                                        className={`flex items-center space-x-1 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all ${
+                                                            expertRating && availableRating
+                                                                ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm'
+                                                                : 'bg-slate-150 text-slate-400 cursor-not-allowed'
+                                                        }`}
+                                                    >
+                                                        <span>Next Step</span>
+                                                        <Icon name="chevronright" className="w-4 h-4" />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* STEP 5: QUALITATIVE WRAP-UP */}
+                                        {currentStep === 5 && (
+                                            <div className="space-y-6 animate-fadeIn">
+                                                <div className="flex items-center space-x-3 mb-2">
+                                                    <div className="p-2 bg-indigo-100 text-indigo-700 rounded-lg">
+                                                        <Icon name="messagesquare" className="w-5 h-5" />
+                                                    </div>
+                                                    <div>
+                                                        <h3 className="text-lg font-bold text-slate-900">Stop, Start, & Continue Feedback</h3>
+                                                        <p className="text-xs text-slate-500">Provide direct, constructive remarks. This is vital to leadership growth.</p>
+                                                    </div>
+                                                </div>
+
+                                                <div className="space-y-1.5">
+                                                    <label className="block text-sm font-semibold text-emerald-800 flex items-center space-x-1">
+                                                        <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                                        <span>What should they START doing?</span>
+                                                    </label>
+                                                    <textarea
+                                                        rows="2"
+                                                        value={startFeedback}
+                                                        onChange={(e) => setStartFeedback(e.target.value)}
+                                                        placeholder="Example: Start sharing your closing scripts with the newer team members earlier in onboarding."
+                                                        className="w-full rounded-xl border border-slate-200 p-3 text-sm focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-600 transition-all outline-hidden"
+                                                    />
+                                                </div>
+
+                                                <div className="space-y-1.5 pt-2 border-t border-slate-100">
+                                                    <label className="block text-sm font-semibold text-red-800 flex items-center space-x-1">
+                                                        <span className="w-2 h-2 rounded-full bg-red-500"></span>
+                                                        <span>What should they STOP doing?</span>
+                                                    </label>
+                                                    <textarea
+                                                        rows="2"
+                                                        value={stopFeedback}
+                                                        onChange={(e) => setStopFeedback(e.target.value)}
+                                                        placeholder="Example: Stop rescheduling our 1-on-1s last minute; it breaks the momentum of the sales week."
+                                                        className="w-full rounded-xl border border-slate-200 p-3 text-sm focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-600 transition-all outline-hidden"
+                                                    />
+                                                </div>
+
+                                                <div className="space-y-1.5 pt-2 border-t border-slate-100">
+                                                    <label className="block text-sm font-semibold text-indigo-800 flex items-center space-x-1">
+                                                        <span className="w-2 h-2 rounded-full bg-indigo-500"></span>
+                                                        <span>What should they CONTINUE doing?</span>
+                                                    </label>
+                                                    <textarea
+                                                        rows="2"
+                                                        value={continueFeedback}
+                                                        onChange={(e) => setContinueFeedback(e.target.value)}
+                                                        placeholder="Example: Continue being extremely supportive when high-priority pricing approvals are urgent..."
+                                                        className="w-full rounded-xl border border-slate-200 p-3 text-sm focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-600 transition-all outline-hidden"
+                                                    />
+                                                </div>
+
+                                                <div className="p-3 bg-indigo-50/50 border border-indigo-100 rounded-xl text-xs text-slate-500 flex items-start space-x-2.5">
+                                                    <Icon name="lock" className="w-4 h-4 text-indigo-600 shrink-0 mt-0.5" />
+                                                    <div>
+                                                        <span className="font-semibold text-slate-800">Submit Honest, Professional Growth Feedback:</span> Our algorithms filter out formatting and language patterns to protect anonymity. Write feedback as constructively as possible.
+                                                    </div>
+                                                </div>
+
+                                                <div className="flex justify-between pt-6 border-t border-slate-100">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setCurrentStep(4)}
+                                                        className="flex items-center space-x-1 px-4 py-2 border border-slate-200 rounded-xl text-slate-600 font-semibold text-sm hover:bg-slate-50"
+                                                    >
+                                                        <Icon name="chevronleft" className="w-4 h-4" />
+                                                        <span>Back</span>
+                                                    </button>
+                                                    <button
+                                                        type="submit"
+                                                        className="flex items-center space-x-2 px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl shadow-md shadow-emerald-100 transition-all"
+                                                    >
+                                                        <Icon name="send" className="w-4 h-4" />
+                                                        <span>Submit Securely</span>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                    </form>
+                                </div>
+                            ) : (
+                                /* SUCCESS CONFIRMATION */
+                                <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 text-center max-w-lg mx-auto animate-scaleUp">
+                                    <div className="inline-flex items-center justify-center p-4 bg-emerald-100 text-emerald-600 rounded-full mb-4">
+                                        <Icon name="checkcircle" className="w-12 h-12" />
+                                    </div>
+                                    <h3 className="text-2xl font-bold text-slate-900 mb-2">Submission Encrypted & Transmitted</h3>
+                                    <p className="text-slate-500 text-sm leading-relaxed mb-6">
+                                        Thank you for contributing to leadership development. Your feedback was randomized and compiled with other reviews to maintain total anonymity.
+                                    </p>
+                                    <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 justify-center">
+                                        <button
+                                            onClick={startNewFeedback}
+                                            className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl text-sm transition-all"
+                                        >
+                                            Rate Another Leader
+                                        </button>
+                                        <button
+                                            onClick={() => handleTabChange('dashboard')}
+                                            className="px-5 py-2.5 border border-slate-200 hover:bg-slate-50 text-slate-600 font-semibold rounded-xl text-sm transition-all"
+                                        >
+                                            View Overall Analytics
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+
+                        </main>
+                    )}
+
+                    {/* ==========================================
+                        MANAGEMENT & ANALYTICS DASHBOARD
+                        ========================================== */}
+                    {activeTab === 'dashboard' && isAdminAuthenticated && (
+                        <main className="max-w-7xl mx-auto px-4 py-8 sm:px-6 animate-scaleUp">
+                            
+                            <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between pb-6 border-b border-slate-200 mb-8 space-y-4 lg:space-y-0">
+                                <div>
+                                    <div className="flex items-center space-x-2.5">
+                                        <h2 className="text-2xl font-black text-slate-950">Leadership Coaching & Availability Dashboard</h2>
+                                        <span className="inline-flex items-center space-x-1 bg-emerald-100 text-emerald-800 text-xs font-extrabold px-2.5 py-0.5 rounded-full border border-emerald-200">
+                                            <Icon name="unlock" className="w-3 h-3" />
+                                            <span>Admin Session</span>
+                                        </span>
+                                    </div>
+                                    <p className="text-sm text-slate-500 mt-1">Real-time aggregate reporting on how consistently sales leaders support their teams.</p>
+                                </div>
+                                
+                                <div className="flex flex-wrap items-center gap-2 w-full lg:w-auto">
+                                    <div className="relative">
+                                        <select
+                                            value={dashboardManagerId}
+                                            onChange={(e) => setDashboardManagerId(e.target.value)}
+                                            className="appearance-none bg-white border border-slate-200 text-slate-800 py-2 pl-4 pr-10 rounded-xl font-semibold text-sm focus:ring-2 focus:ring-indigo-500/15 focus:outline-hidden transition-all cursor-pointer shadow-xs"
+                                        >
+                                            {managers.map(m => (
+                                                <option key={m.id} value={m.id}>{m.name} ({m.team})</option>
+                                            ))}
+                                        </select>
+                                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-500">
+                                            <Icon name="chevronright" className="w-4 h-4 transform rotate-90" />
+                                        </div>
+                                    </div>
+
+                                    <button
+                                        onClick={() => setShowAddManagerModal(true)}
+                                        className="flex items-center space-x-1 px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold rounded-xl transition-all shadow-md shadow-slate-900/10"
+                                    >
+                                        <Icon name="plus" className="w-4 h-4" />
+                                        <span>Add Manager</span>
+                                    </button>
+
+                                    <button
+                                        onClick={handleLockDashboard}
+                                        className="flex items-center space-x-1 px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-sm font-semibold rounded-xl transition-all shadow-md shadow-rose-600/15"
+                                        title="Lock admin session immediately"
+                                    >
+                                        <Icon name="lock" className="w-4 h-4" />
+                                        <span>Lock Dashboard</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* ADD MANAGER MODAL POPUP */}
+                            {showAddManagerModal && (
+                                <div className="fixed inset-0 bg-slate-950/40 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+                                    <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100 animate-scaleUp">
+                                        <h3 className="text-lg font-bold text-slate-900 mb-2">Add New Sales Leader</h3>
+                                        <p className="text-xs text-slate-500 mb-4">Add a sales manager to let agents immediately submit 360 reviews for them.</p>
+                                        <form onSubmit={handleAddManager} className="space-y-4">
+                                            <div>
+                                                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Manager's Full Name</label>
+                                                <input
+                                                    type="text"
+                                                    required
+                                                    placeholder="e.g. Jessica Thorne"
+                                                    value={newManagerName}
+                                                    onChange={(e) => setNewManagerName(e.target.value)}
+                                                    className="w-full rounded-xl border border-slate-200 p-2.5 text-sm focus:ring-2 focus:ring-indigo-500/10 focus:outline-hidden"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Sales Team/Segment</label>
+                                                <input
+                                                    type="text"
+                                                    required
+                                                    placeholder="e.g. Enterprise West SDRs"
+                                                    value={newManagerTeam}
+                                                    onChange={(e) => setNewManagerTeam(e.target.value)}
+                                                    className="w-full rounded-xl border border-slate-200 p-2.5 text-sm focus:ring-2 focus:ring-indigo-500/10 focus:outline-hidden"
+                                                />
+                                            </div>
+                                            <div className="flex space-x-2 pt-2 justify-end">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setShowAddManagerModal(false)}
+                                                    className="px-4 py-2 border border-slate-200 text-slate-600 rounded-xl text-xs font-semibold hover:bg-slate-50"
+                                                >
+                                                    Cancel
+                                                </button>
+                                                <button
+                                                    type="submit"
+                                                    className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold"
+                                                >
+                                                    Add & Select Manager
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* DASHBOARD CORE METRICS & SCORECARDS */}
+                            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                                <div className="md:col-span-2 bg-white rounded-2xl border border-slate-200 p-6 shadow-xs flex flex-col justify-between relative overflow-hidden">
+                                    <div className="absolute right-0 bottom-0 opacity-5 transform translate-x-1/6 translate-y-1/6 text-indigo-900">
+                                        <Icon name="award" className="w-56 h-56" />
+                                    </div>
+                                    <div>
+                                        <div className="flex justify-between items-start">
+                                            <div>
+                                                <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Overall Support Health</span>
+                                                <h3 className="text-2xl font-black text-slate-900 mt-1">{managerStats.manager.name}</h3>
+                                                <p className="text-xs font-semibold text-indigo-600">{managerStats.manager.team}</p>
+                                            </div>
+                                            <div className="bg-indigo-50 text-indigo-700 text-xs px-2.5 py-1 rounded-full font-bold">
+                                                {managerStats.totalFeedback} submissions
+                                            </div>
+                                        </div>
+
+                                        <div className="flex items-baseline space-x-3 mt-6">
+                                            <span className="text-5xl font-black text-slate-950">{managerStats.overallScore || "—"}</span>
+                                            <span className="text-lg font-bold text-slate-400">/ 5.0 Rating</span>
+                                        </div>
+                                    </div>
+
+                                    <div className="pt-4 border-t border-slate-100 mt-4 flex items-center justify-between text-xs text-slate-500">
+                                        <span className="flex items-center space-x-1.5">
+                                            <Icon name="shield" className="w-3.5 h-3.5 text-emerald-500" />
+                                            <span>Aggregated Scorecard</span>
+                                        </span>
+                                        <span>Values calculated from dynamic feedback</span>
+                                    </div>
+                                </div>
+
+                                <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs flex flex-col justify-between">
+                                    <div>
+                                        <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Growth Focus</span>
+                                        <div className="space-y-4 mt-4">
+                                            <div>
+                                                <div className="flex justify-between items-center mb-1">
+                                                    <span className="text-xs font-semibold text-slate-600">Coaching Quality</span>
+                                                    <span className="text-xs font-bold text-slate-900">{managerStats.avgCoaching || "N/A"}/5</span>
+                                                </div>
+                                                <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                                                    <div className="bg-emerald-500 h-full rounded-full" style={{ width: `${(managerStats.avgCoaching / 5) * 100}%` }}></div>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <div className="flex justify-between items-center mb-1">
+                                                    <span className="text-xs font-semibold text-slate-600">Meeting Quality</span>
+                                                    <span className="text-xs font-bold text-slate-900">{managerStats.avgMeetings || "N/A"}/5</span>
+                                                </div>
+                                                <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                                                    <div className="bg-blue-500 h-full rounded-full" style={{ width: `${(managerStats.avgMeetings / 5) * 100}%` }}></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p className="text-[11px] text-slate-400 mt-4 leading-relaxed">Ideally keeping score above 4.0 keeps SDRs & AE execution rates optimal.</p>
+                                </div>
+
+                                <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs flex flex-col justify-between">
+                                    <div>
+                                        <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Access & Execution</span>
+                                        <div className="space-y-4 mt-4">
+                                            <div>
+                                                <div className="flex justify-between items-center mb-1">
+                                                    <span className="text-xs font-semibold text-slate-600">Subject Expertise</span>
+                                                    <span className="text-xs font-bold text-slate-900">{managerStats.avgExpert || "N/A"}/5</span>
+                                                </div>
+                                                <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                                                    <div className="bg-purple-500 h-full rounded-full" style={{ width: `${(managerStats.avgExpert / 5) * 100}%` }}></div>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <div className="flex justify-between items-center mb-1">
+                                                    <span className="text-xs font-semibold text-slate-600">Availability</span>
+                                                    <span className="text-xs font-bold text-slate-900">{managerStats.avgAvailable || "N/A"}/5</span>
+                                                </div>
+                                                <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                                                    <div className="bg-indigo-500 h-full rounded-full" style={{ width: `${(managerStats.avgAvailable / 5) * 100}%` }}></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p className="text-[11px] text-slate-400 mt-4 leading-relaxed">Responsive leaders prevent sales pipeline slippage and raise team closing rates.</p>
+                                </div>
+                            </div>
+
+                            {/* IF NO FEEDBACK SUBMISSIONS */}
+                            {managerStats.totalFeedback === 0 ? (
+                                <div className="bg-white border border-slate-200 rounded-2xl p-12 text-center max-w-lg mx-auto mb-12 animate-scaleUp">
+                                    <div className="w-14 h-14 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <Icon name="alertcircle" className="w-8 h-8" />
+                                    </div>
+                                    <h3 className="text-lg font-bold text-slate-900 mb-2">No Reviews Submitted Yet</h3>
+                                    <p className="text-slate-500 text-sm leading-relaxed mb-6">
+                                        This manager hasn't received any anonymous feedback evaluations yet. Switch to the agent tab to submit their first review.
+                                    </p>
+                                    <button
+                                        onClick={() => { setSelectedManagerId(dashboardManagerId); setActiveTab('agent'); }}
+                                        className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl text-xs transition-all"
+                                    >
+                                        Submit First Anonymous Review
+                                    </button>
+                                </div>
+                            ) : (
+                                <>
+                                    {/* VISUAL CHART SECTIONS */}
+                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                                        
+                                        {/* Chart 1: Progress Profile */}
+                                        <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs">
+                                            <div className="flex items-center justify-between mb-6">
+                                                <div>
+                                                    <h4 className="font-bold text-slate-900">Leadership Dimension Scorecard</h4>
+                                                    <p className="text-xs text-slate-500">Visual mapping of support traits</p>
+                                                </div>
+                                                <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Range 1-5</span>
+                                            </div>
+
+                                            <div className="space-y-4">
+                                                <div>
+                                                    <div className="flex justify-between items-center mb-1 text-xs">
+                                                        <span className="font-bold text-slate-700">1. Regular 1-on-1 Coaching</span>
+                                                        <span className="font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">{managerStats.avgCoaching} / 5</span>
+                                                    </div>
+                                                    <div className="relative h-6 bg-slate-100 rounded-md overflow-hidden flex items-center">
+                                                        <div className="bg-emerald-500 h-full rounded-l-md transition-all duration-500" style={{ width: `${(managerStats.avgCoaching / 5) * 100}%` }}></div>
+                                                        <span className="absolute left-3 text-[10px] font-bold text-slate-700 mix-blend-difference">1-on-1 Growth Strategy</span>
+                                                    </div>
+                                                </div>
+
+                                                <div>
+                                                    <div className="flex justify-between items-center mb-1 text-xs">
+                                                        <span className="font-bold text-slate-700">2. Structured Team Meetings</span>
+                                                        <span className="font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md">{managerStats.avgMeetings} / 5</span>
+                                                    </div>
+                                                    <div className="relative h-6 bg-slate-100 rounded-md overflow-hidden flex items-center">
+                                                        <div className="bg-blue-500 h-full rounded-l-md transition-all duration-500" style={{ width: `${(managerStats.avgMeetings / 5) * 100}%` }}></div>
+                                                        <span className="absolute left-3 text-[10px] font-bold text-slate-700 mix-blend-difference">Alignment & Tactics</span>
+                                                    </div>
+                                                </div>
+
+                                                <div>
+                                                    <div className="flex justify-between items-center mb-1 text-xs">
+                                                        <span className="font-bold text-slate-700">3. Leadership Selling Expertise</span>
+                                                        <span className="font-black text-purple-600 bg-purple-50 px-2 py-0.5 rounded-md">{managerStats.avgExpert} / 5</span>
+                                                    </div>
+                                                    <div className="relative h-6 bg-slate-100 rounded-md overflow-hidden flex items-center">
+                                                        <div className="bg-purple-500 h-full rounded-l-md transition-all duration-500" style={{ width: `${(managerStats.avgExpert / 5) * 100}%` }}></div>
+                                                        <span className="absolute left-3 text-[10px] font-bold text-slate-700 mix-blend-difference">Objection Handling & Closing</span>
+                                                    </div>
+                                                </div>
+
+                                                <div>
+                                                    <div className="flex justify-between items-center mb-1 text-xs">
+                                                        <span className="font-bold text-slate-700">4. High-Stakes Availability</span>
+                                                        <span className="font-black text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md">{managerStats.avgAvailable} / 5</span>
+                                                    </div>
+                                                    <div className="relative h-6 bg-slate-100 rounded-md overflow-hidden flex items-center">
+                                                        <div className="bg-indigo-500 h-full rounded-l-md transition-all duration-500" style={{ width: `${(managerStats.avgAvailable / 5) * 100}%` }}></div>
+                                                        <span className="absolute left-3 text-[10px] font-bold text-slate-700 mix-blend-difference">Live Lead Assistance</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Chart 2: Frequency Distribution Counts */}
+                                        <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs">
+                                            <h4 className="font-bold text-slate-900 mb-1">Frequency Distributions</h4>
+                                            <p className="text-xs text-slate-500 mb-6">How consistently do agents claim they engage in scheduled huddles & coaching?</p>
+
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                                                    <span className="text-xs font-bold text-slate-700 block mb-3">Coaching Frequency</span>
+                                                    <div className="space-y-2">
+                                                        {['Daily', 'Weekly', 'Bi-weekly', 'Monthly', 'Rarely'].map(key => {
+                                                            const count = managerStats.coachingFreqDistribution[key] || 0;
+                                                            const pct = managerStats.totalFeedback > 0 ? (count / managerStats.totalFeedback) * 100 : 0;
+                                                            return (
+                                                                <div key={key} className="text-[11px] space-y-1">
+                                                                    <div className="flex justify-between">
+                                                                        <span className="font-semibold text-slate-500">{key}</span>
+                                                                        <span className="font-bold text-slate-700">{count} reports</span>
+                                                                    </div>
+                                                                    <div className="w-full bg-slate-200 h-1 rounded-full">
+                                                                        <div className="bg-emerald-500 h-full rounded-full" style={{ width: `${pct}%` }}></div>
+                                                                    </div>
+                                                                </div>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                </div>
+
+                                                <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                                                    <span className="text-xs font-bold text-slate-700 block mb-3">Meetings Frequency</span>
+                                                    <div className="space-y-2">
+                                                        {['Daily Huddles', 'Weekly', 'Bi-weekly', 'Monthly', 'Rarely'].map(key => {
+                                                            const count = managerStats.meetingsFreqDistribution[key] || 0;
+                                                            const pct = managerStats.totalFeedback > 0 ? (count / managerStats.totalFeedback) * 100 : 0;
+                                                            return (
+                                                                <div key={key} className="text-[11px] space-y-1">
+                                                                    <div className="flex justify-between">
+                                                                        <span className="font-semibold text-slate-500">{key}</span>
+                                                                        <span className="font-bold text-slate-700">{count} reports</span>
+                                                                    </div>
+                                                                    <div className="w-full bg-slate-200 h-1 rounded-full">
+                                                                        <div className="bg-blue-500 h-full rounded-full" style={{ width: `${pct}%` }}></div>
+                                                                    </div>
+                                                                </div>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                    {/* QUALITATIVE INSIGHT PANEL (START, STOP, CONTINUE) */}
+                                    <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs">
+                                        <div className="flex items-center space-x-2 mb-6">
+                                            <div className="p-1.5 bg-indigo-50 text-indigo-700 rounded-lg">
+                                                <Icon name="sparkles" className="w-5 h-5" />
+                                            </div>
+                                            <div>
+                                                <h4 className="font-bold text-slate-900">Direct Actions & Support Feedback</h4>
+                                                <p className="text-xs text-slate-500">Categorized growth directives parsed directly from live agent submissions</p>
+                                            </div>
+                                        </div>
+
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                            
+                                            {/* START CATEGORY */}
+                                            <div className="space-y-3">
+                                                <div className="flex items-center space-x-2 bg-emerald-50 text-emerald-800 px-3 py-2 rounded-xl border border-emerald-100">
+                                                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                                    <span className="font-bold text-xs uppercase tracking-wider">Start Doing</span>
+                                                </div>
+                                                <div className="space-y-2 max-h-96 overflow-y-auto pr-1">
+                                                    {managerStats.comments.map((comment, idx) => (
+                                                        comment.start && (
+                                                            <div key={idx} className="p-3 bg-white border border-slate-150 rounded-xl text-xs text-slate-700 shadow-2xs leading-relaxed animate-fadeIn">
+                                                                "{comment.start}"
+                                                            </div>
+                                                        )
+                                                    ))}
+                                                </div>
+                                            </div>
+
+                                            {/* STOP CATEGORY */}
+                                            <div className="space-y-3">
+                                                <div className="flex items-center space-x-2 bg-red-50 text-red-800 px-3 py-2 rounded-xl border border-red-100">
+                                                    <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></span>
+                                                    <span className="font-bold text-xs uppercase tracking-wider">Stop Doing</span>
+                                                </div>
+                                                <div className="space-y-2 max-h-96 overflow-y-auto pr-1">
+                                                    {managerStats.comments.map((comment, idx) => (
+                                                        comment.stop && (
+                                                            <div key={idx} className="p-3 bg-white border border-slate-150 rounded-xl text-xs text-slate-700 shadow-2xs leading-relaxed animate-fadeIn">
+                                                                "{comment.stop}"
+                                                            </div>
+                                                        )
+                                                    ))}
+                                                </div>
+                                            </div>
+
+                                            {/* CONTINUE CATEGORY */}
+                                            <div className="space-y-3">
+                                                <div className="flex items-center space-x-2 bg-indigo-50 text-indigo-800 px-3 py-2 rounded-xl border border-indigo-100">
+                                                    <span className="w-2.5 h-2.5 rounded-full bg-indigo-500 animate-pulse"></span>
+                                                    <span className="font-bold text-xs uppercase tracking-wider">Continue Doing</span>
+                                                </div>
+                                                <div className="space-y-2 max-h-96 overflow-y-auto pr-1">
+                                                    {managerStats.comments.map((comment, idx) => (
+                                                        comment.continue && (
+                                                            <div key={idx} className="p-3 bg-white border border-slate-150 rounded-xl text-xs text-slate-700 shadow-2xs leading-relaxed animate-fadeIn">
+                                                                "{comment.continue}"
+                                                            </div>
+                                                        )
+                                                    ))}
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </>
+                            )}
+
+                        </main>
+                    )}
+
+                    {/* ==========================================
+                        FOOTER / COMPLIANCE BANNER
+                        ========================================== */}
+                    <footer className="bg-slate-900 text-slate-400 py-12 border-t border-slate-800 mt-16">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-xs">
+                                <div>
+                                    <div className="flex items-center space-x-2 text-white mb-3">
+                                        <Icon name="shield" className="w-5 h-5 text-indigo-400" />
+                                        <span className="font-bold text-sm">SafeSpace 360 Encryption</span>
+                                    </div>
+                                    <p className="leading-relaxed">
+                                        Our database uses unidirectional mapping keys. Once an agent hits submit, details regarding user agents, active login hashes, browser details, and submit times are immediately stripped, rendering submissions trace-free.
+                                    </p>
+                                </div>
+                                <div>
+                                    <span className="font-bold text-white text-sm block mb-3">The Sales Manager Pledge</span>
+                                    <p className="leading-relaxed">
+                                        True growth comes from hearing difficult facts. This platform focuses entirely on critical metrics: regular 1-on-1 development, meeting efficiency, subject expertise, and operational accessibility.
+                                    </p>
+                                </div>
+                                <div>
+                                    <span className="font-bold text-white text-sm block mb-3">Exporting and Auditing</span>
+                                    <p className="leading-relaxed">
+                                        Enterprise Admins can export sanitized feedback records directly to executive CSV report sheets for further HR analysis.
+                                    </p>
+                                    <div className="mt-4 flex space-x-3 text-slate-500">
+                                        <span className="hover:text-white cursor-pointer">Security Audits</span>
+                                        <span>•</span>
+                                        <span className="hover:text-white cursor-pointer">Admin Panel</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="pt-8 border-t border-slate-800 mt-8 text-center text-[11px] text-slate-600 flex flex-col sm:flex-row items-center justify-between">
+                                <span>&copy; 2026 Sales Leader 360° Systems. Created to support sales excellence.</span>
+                                <span className="flex items-center space-x-1.5 mt-2 sm:mt-0">
+                                    <span>Made with care for Sales Orgs</span>
+                                    <Icon name="heart" className="w-3.5 h-3.5 text-indigo-500 fill-indigo-500" />
+                                </span>
+                            </div>
+                        </div>
+                    </footer>
+
+                </div>
+            );
+        }
+
+        // ==========================================
+        // INIT APPLICATION
+        // ==========================================
+        const rootElement = document.getElementById('root');
+        const root = ReactDOM.createRoot(rootElement);
+        root.render(<App />);
+    </script>
+</body>
+</html>
